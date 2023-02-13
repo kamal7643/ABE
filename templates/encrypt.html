@@ -47,6 +47,16 @@
             float: right;
         }
 
+        form{
+            border: 1px solid gray;
+            padding:10px;
+            margin: 0;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
         /* Add media queries for responsiveness - when the screen is 500px wide or less, stack the links on top of each other */
         @media screen and (max-width: 500px) {
             .header a {
@@ -73,9 +83,24 @@
         </div>
 
          <form action = "/encrypt" method = "post" enctype="multipart/form-data">  
-            <label>policies : </label><input type="file" name="policies"/><br/>
-            <label>file : </label><input type='file' name='files' multiple=''> 
-            <input type = "submit" value="Upload">  
+            <table>
+                <th></th>
+                <tr>
+                    <td><label>policies : </label></td>
+                    <td><input type="file" name="policies"/></td>
+                </tr>
+                <tr>
+                    <td><label>files : </label></td>
+                    <td><input type='file' name='files' multiple=''></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td><input type = "submit" value="Upload"> </td>
+                </tr>
+            </table>
+            <br/>
+             
+             
         </form> 
     </div>
 </body>

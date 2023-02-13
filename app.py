@@ -3,11 +3,14 @@ from distutils.log import debug
 from fileinput import filename
 from py4j.java_gateway import JavaGateway
 import shutil 
+import os
 
 
 app = Flask(__name__)
 gateway = JavaGateway()
 ABE = gateway.entry_point
+
+
 
 ABE.setup()
 
@@ -31,6 +34,7 @@ def encrypt():
 @app.route('/encrypt', methods = ['POST'])  
 def success():  
     if request.method == 'POST':  
+        os.mkdir(".dir/.files")
         f = request.files['policies']
         f.save(".dir/policies.json")  
         files = request.files.getlist("files")
@@ -39,6 +43,7 @@ def success():
         for file in files:
             file.save(".dir/.files/"+file.filename)
         
+        os.mkdir(".dir/encrypted")
         ABE.enc()
         
         return redirect("/encryption/download")
@@ -52,6 +57,9 @@ def down_enc():
         pass
     elif request.method=='POST':
         archived = shutil.make_archive('encyption', 'zip', '.dir/encrypted')
+        
+        shutil.rmtree(".dir/.files");
+        shutil.rmtree(".dir/encrypted")
         return send_file('encyption.zip')
         pass
 
@@ -61,6 +69,15 @@ def decrypt():
     if request.method=='GET':
         return render_template('decrypt.html')
     elif request.method=='POST':
+        os.mkdir(".dir/encrypted")
+        os.mkdir(".dir/decrypted")
+        f = request.files['attribute']
+        f.save(".dir/attribute.json")  
+        files = request.files.getlist("files")
+  
+        # Iterate for each file in the files List, and Save them
+        for file in files:
+            file.save(".dir/encrypted/"+file.filename)
         ABE.keygen()
         ABE.dec()
         return redirect("/decryption/download")
@@ -72,6 +89,8 @@ def down_dec():
         pass
     elif request.method=='POST':
         archived = shutil.make_archive('decryption', 'zip', '.dir/decrypted')
+        shutil.rmtree(".dir/decrypted")
+        shutil.rmtree(".dir/encrypted")
         return send_file('decryption.zip')
         pass
 

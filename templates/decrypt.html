@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Decryption using ABE</title>
+    <title>Encryption using ABE</title>
     <style>
         .header {
             overflow: hidden;
@@ -47,6 +47,16 @@
             float: right;
         }
 
+        form{
+            border: 1px solid gray;
+            padding:10px;
+            margin: 0;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
         /* Add media queries for responsiveness - when the screen is 500px wide or less, stack the links on top of each other */
         @media screen and (max-width: 500px) {
             .header a {
@@ -67,12 +77,30 @@
             <a href="#default" class="logo">ABE</a>
             <div class="header-right">
                 <a href="/">Home</a>
-                <a href="/encrypt">Encrypt</a>
+                <a  href="/encrypt">Encrypt</a>
                 <a class="active" href="/decrypt">Decrypt</a>
             </div>
         </div>
-        <form action = "/decrypt" method = "post" enctype="multipart/form-data">  
-            <input type = "submit" value="decrypt">  
+
+         <form action = "/decrypt" method = "post" enctype="multipart/form-data">  
+            <table>
+                <th></th>
+                <tr>
+                    <td><label>Attributes : </label></td>
+                    <td><input type="file" name="attribute"/></td>
+                </tr>
+                <tr>
+                    <td><label>files : </label></td>
+                    <td><input type='file' name='files' multiple=''></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td><input type = "submit" value="Upload"> </td>
+                </tr>
+            </table>
+            <br/>
+             
+             
         </form> 
     </div>
 </body>

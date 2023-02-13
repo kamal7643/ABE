@@ -18,7 +18,7 @@ public class App {
     static String mskfile = dir + "/master_key";
     static String prvfile = dir + "/prv_key";
 
-    static String user_attribute = "firstname:kamal lastname:swami department:cs batch:2019 age:21 designation:student";
+    static String user_attribute = "";
     static ArrayList<String> file_attributes = new ArrayList<String>();
     static Cpabe ABE = new Cpabe();
     static String policy = "";
@@ -33,7 +33,10 @@ public class App {
         ABE.setup(pubfile, mskfile);
     }
 
-    public static void keygen() throws NoSuchAlgorithmException, IOException {
+    public static void keygen() throws NoSuchAlgorithmException, IOException, ParseException {
+        JSONParser jp = new JSONParser();
+        JSONObject o = (JSONObject) jp.parse(new FileReader(dir+"/attribute.json"));
+        user_attribute="id:"+o.get("id")+" designation:"+o.get("designation")+" department:"+o.get("department");
         ABE.keygen(pubfile, prvfile, mskfile, user_attribute);
     }
 
