@@ -37,3 +37,23 @@ cd /Users/kamalswami/Documents/ABE ; python app.py
 
 # connect to ngrok
 cd /Users/kamalswami/Downloads ; ./ngrok http 5000 
+
+
+
+# ubuntu 
+
+
+javac -classpath lib/*:. -d bin -sourcepath . src/*/*.java src/*/policy/*.java src/App.java 
+
+// java /bin/App
+
+
+sudo apt install virtualenv
+
+
+virtualenv venv
+source venv
+
+
+pip install -r requirements.txt
+python app.py
