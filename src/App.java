@@ -10,7 +10,8 @@ import org.json.simple.parser.*;
 import java.io.FileReader;
 
 public class App {
-    static String dir = "/Users/kamalswami/Documents/ABE/.dir";
+    // static String dir = "/Users/kamalswami/Documents/ABE/.dir";
+    static String dir = "/home/azureuser/ABE/.dir";
 
     static String files_dir = dir + "/.files";
 
