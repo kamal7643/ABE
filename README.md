@@ -8,7 +8,7 @@
 
 # ubuntu 
 
-
+```
 ## install jdk
 sudo apt install openjdk-17-jdk
 
@@ -33,7 +33,7 @@ pip install -r requirements.txt
 ## start flask servers
 python app.py
 
-
+```
 
 # flask application
 ## paths
