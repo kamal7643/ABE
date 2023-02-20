@@ -1,18 +1,23 @@
 from flask import Flask, render_template, request, redirect, send_file
 from distutils.log import debug
 from fileinput import filename
-from py4j.java_gateway import JavaGateway
+# from py4j.java_gateway import JavaGateway
 import shutil 
 import os
 
 
 app = Flask(__name__)
-gateway = JavaGateway()
-ABE = gateway.entry_point
+# gateway = JavaGateway()
+# ABE = gateway.entry_point
 
 
+key = os.environ["COG_SERVICE_KEY"]
+region = os.environ["COG_SERVICE_REGION"]
+endpoint = os.environ["ENDPOINT"]
+COG_endpoint = os.environ["COG_SERVICE_ENDPOINT"]
 
-ABE.setup()
+
+# ABE.setup()
 
 result = {
     'name':'Kamal swami',
@@ -44,7 +49,7 @@ def success():
             file.save(".dir/.files/"+file.filename)
         
         os.mkdir(".dir/encrypted")
-        ABE.enc()
+        # ABE.enc()
         
         return redirect("/encryption/download")
         # return render_template("Acknowledgement.html", name = f.filename)  
@@ -78,8 +83,8 @@ def decrypt():
         # Iterate for each file in the files List, and Save them
         for file in files:
             file.save(".dir/encrypted/"+file.filename)
-        ABE.keygen()
-        ABE.dec()
+        # ABE.keygen()
+        # ABE.dec()
         return redirect("/decryption/download")
 
 @app.route("/decryption/download", methods=['GET', 'POST'])
