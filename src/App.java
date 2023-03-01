@@ -11,7 +11,10 @@ import java.io.FileReader;
 
 public class App {
     // static String dir = "/Users/kamalswami/Documents/ABE/.dir";
-    static String dir = "/home/azureuser/ABE/.dir";
+    static String dir = System.getProperty("user.dir")+"/.dir";
+    
+    // dir = dir;
+    // static String dir = "/home/azureuser/ABE/.dir";
 
     static String files_dir = dir + "/.files";
 
@@ -27,6 +30,7 @@ public class App {
     public static void main(String[] args) throws Exception {
         GatewayServer gatewayServer = new GatewayServer(new App());
         gatewayServer.start();
+        System.out.println(dir);
         System.out.println("Gateway Server Started");
     }
 
@@ -37,7 +41,11 @@ public class App {
     public static void keygen() throws NoSuchAlgorithmException, IOException, ParseException {
         JSONParser jp = new JSONParser();
         JSONObject o = (JSONObject) jp.parse(new FileReader(dir+"/attribute.json"));
-        user_attribute="id:"+o.get("id")+" designation:"+o.get("designation")+" department:"+o.get("department");
+        JSONObject userattr = (JSONObject)o.get("user-attribute");
+        JSONObject envattr = (JSONObject)o.get("env-attribute");
+        user_attribute="id:"+userattr.get("id")+" designation:"+userattr.get("designation")+" department:"+userattr.get("department");
+        user_attribute+=" env-time:"+envattr.get("time")+" env-day:"+envattr.get("day")+" env-month:"+envattr.get("month")+ " env-year:"+envattr.get("year");
+        println(user_attribute);
         ABE.keygen(pubfile, prvfile, mskfile, user_attribute);
     }
 
