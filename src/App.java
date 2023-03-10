@@ -8,6 +8,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.*;
 import java.io.FileReader;
+import java.lang.Integer;
 
 public class App {
     // static String dir = "/Users/kamalswami/Documents/ABE/.dir";
@@ -44,7 +45,7 @@ public class App {
         JSONObject userattr = (JSONObject)o.get("user-attribute");
         JSONObject envattr = (JSONObject)o.get("env-attribute");
         user_attribute="id:"+userattr.get("id")+" designation:"+userattr.get("designation")+" department:"+userattr.get("department");
-        user_attribute+=" env-time:"+envattr.get("time")+" env-day:"+envattr.get("day")+" env-month:"+envattr.get("month")+ " env-year:"+envattr.get("year");
+        user_attribute+=" env-time:"+envTime(envattr.get("time").toString())+" env-day:"+envattr.get("day")+" env-month:"+envattr.get("month")+ " env-year:"+envattr.get("year");
         println(user_attribute);
         ABE.keygen(pubfile, prvfile, mskfile, user_attribute);
     }
@@ -108,6 +109,12 @@ public class App {
 			ABE.dec(pubfile, prvfile, dir+"/encrypted/"+file_attributes.get(i).split(" ")[0].split(":")[1]+".cpabe", dir+"/decrypted/"+file_attributes.get(i).split(" ")[0].split(":")[1]);
 		}
 		println("//end to dec");
+    }
+
+    public static String envTime(String time) {
+        int t = Integer.parseInt(time);
+        if(t>=700 && t<=1900)return "day";
+        return "night";
     }
 
     private static void println(Object o) {
