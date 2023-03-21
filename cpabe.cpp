@@ -6,6 +6,8 @@
 #include <cstddef>
 #include <bitset>
 #include <inttypes.h>
+#include <hashlib++/hashlibpp.h>
+
 
 #include <pbc/pbc.h>
 #include <pbc/pbc_field.h>
@@ -16,7 +18,7 @@ using namespace std;
 
 int LOG =1;
 
-class pubkey
+class cpabePubKey
 {
 public:
     string pairingDesc;
@@ -24,11 +26,30 @@ public:
     element_t g, h, f, gp, g_hat_alpha;
 };
 
-class mstkey
+class cpabeMskKey
 {
 public:
     element_t beta, g_alpha;
 };
+
+class cpabePrvComp{
+    public:
+    string attr;
+    element_t d;
+    element_t dp;
+
+    int used;
+    element_t z;
+    element_t zp;
+};
+
+class cpabePrvKey{
+    public:
+    element_t d;
+    vector<cpabePrvComp>  comps;
+};
+
+
 char curveParams[500] = "type a\nq 8780710799663312522437781984754049815806883199414208211028653399266475630880222957078625179422662221423155858769582317459277713367317481324925129998224791\nh 12016012264891146079388821366740534204802954401251311822919615131047207289359704531102844802183906537786776\nr 730750818665451621361119245571504901405976559617\nexp2 159\nexp1 107\nsign1 1\nsign0 1\n";
 string cp = "type a\nq 8780710799663312522437781984754049815806883199414208211028653399266475630880222957078625179422662221423155858769582317459277713367317481324925129998224791\nh 12016012264891146079388821366740534204802954401251311822919615131047207289359704531102844802183906537786776\nr 730750818665451621361119245571504901405976559617\nexp2 159\nexp1 107\nsign1 1\nsign0 1\n";
 
@@ -36,7 +57,7 @@ class cpabe
 {
 
 public:
-    void setup(int args, char **argv, pubkey &pub_key, mstkey &msk_key)
+    void setup(int args, char **argv, cpabePubKey &pub_key, cpabeMskKey &msk_key)
     {
         element_t alpha, beta_inv;
         pairing_t pairing;
@@ -103,22 +124,69 @@ public:
 		// pub.g_hat_alpha = pairing.pairing(pub.g, msk.g_alpha);
 
         element_pairing(pub_key.g_hat_alpha, pub_key.g, msk_key.g_alpha);
-        printPubKey(pub_key);
+        printcpabePubKey(pub_key);
         // uint8_t bt;
         // cout << (unsigned)bt;
 
-        // vector<uint32_t> o =serializePubKey(pub_key);
+        // vector<uint32_t> o =serializecpabePubKey(pub_key);
 
         // for(int i=0; i<o.size(); i++)cout << (unsigned)o[i];
         
 
     }
 
-    void keygen(){
+    cpabePrvKey keygen(cpabePubKey pk, cpabeMskKey msk, vector<string> attrs){
+        cpabePrvKey prv_key = cpabePrvKey();
+        element_t g_r, r, beta_inv;
+        pairing_t p;
+        // memcpy(p, pk.p, sizeof(pk.p));
+        element_init_G2(prv_key.d, pk.p);
+        element_init_G2(g_r, pk.p);
+        element_init_Zr(r, pk.p);
+        element_init_Zr(beta_inv, pk.p);
 
+        element_random(r);
+        element_init_same_as(g_r, pk.gp);
+        element_pow_zn(g_r, g_r, r);
+
+        element_init_same_as(prv_key.d , msk.g_alpha);
+        element_mul(prv_key.d, prv_key.d, g_r);
+        element_init_same_as(beta_inv, msk.beta);
+        element_invert(beta_inv, beta_inv);
+
+        int i, len = attrs.size();
+
+        prv_key.comps = vector<cpabePrvComp>();
+
+        for(i=0; i<len; i++){
+            cpabePrvComp comp = cpabePrvComp();
+            element_t h_rp, rp;
+
+            comp.attr = attrs[i];
+
+            element_init_G2(comp.d, pk.p);
+            element_init_G1(comp.dp, pk.p);
+            element_init_G2(h_rp, pk.p);
+            element_init_Zr(rp, pk.p);
+
+            //MessageDigest
+            elementFromString(h_rp, comp.attr);
+
+            element_random(rp);
+            element_pow_zn(h_rp, h_rp, rp);
+
+            element_init_same_as(comp.d, g_r);
+            element_mul(comp.d, comp.d, h_rp);
+            element_init_same_as(comp.dp, pk.g);
+            element_pow_zn(comp.dp, comp.dp, rp);
+
+            prv_key.comps.push_back(comp);
+        }
+
+        return prv_key;
     }
 
-    void enc(){
+    void enc(cpabePubKey pk, string policy){
 
     }
 
@@ -126,7 +194,15 @@ public:
 
     }
 
-    void printPubKey(pubkey pk){
+    void elementFromString(element_t &h, string s){
+        hashwrapper *myWrapper = new sha1wrapper();
+        string hash = myWrapper->getHashFromString(s);
+        char * hash1 = (char *)malloc(sizeof(char)*hash.size());
+        for(int i=0; i<hash.size(); i++)hash1[i]=hash[i];
+        element_from_hash(h, (void *)hash1, hash.size());
+    }
+
+    void printcpabePubKey(cpabePubKey pk){
         cout << pk.pairingDesc << "\n";
         element_printf("g %B\n", pk.g);
         element_printf("f %B\n", pk.f);
@@ -136,7 +212,7 @@ public:
         // element_printf("p %B\n", pk.p);
     }
 
-    vector<uint32_t> serializePubKey(pubkey pk){
+    vector<uint32_t> serializecpabePubKey(cpabePubKey pk){
         vector<uint32_t> arrlist;
         serializeString(arrlist, pk.pairingDesc);
         return arrlist;
@@ -177,17 +253,17 @@ public:
 
 int main(int args, char **argv)
 {
-    pubkey pub_key = pubkey();
-    mstkey msk_key = mstkey();
+    cpabePubKey pub_key = cpabePubKey();
+    cpabeMskKey msk_key = cpabeMskKey();
     cpabe test =  cpabe();
     test.log("start setup");
     test.setup(args, argv, pub_key, msk_key);
     test.log("end setup");
     test.log("start enc");
-    test.enc();
+    test.enc(pub_key, "");
     test.log("end enc");
     test.log("start keygen");
-    test.keygen();
+    test.keygen(pub_key, msk_key, vector<string>());
     test.log("end keygen");
     test.log("start dec");
     test.dec();
@@ -199,6 +275,8 @@ int main(int args, char **argv)
 /*
 http://gas.dia.unisa.it/projects/jpbc/docs/pairing.html#initializing
 https://crypto.stanford.edu/pbc/manual.pdf
+https://sourceforge.net/projects/hashlib2plus/files/latest/download
+g++ cpabe.cpp -o main -L. -lgmp -lpbc -lhl++     
 */
 
 //./main <~/Downloads/pbc/param/a.param
