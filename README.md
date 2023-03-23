@@ -53,3 +53,10 @@
 <li>enc</li>
 <li>dec</li>
 </ul>
+
+
+
+# cpp and python
+
+g++ -fPIC -shared -o myclass.so myclass.cpp
+g++ -fPIC -shared -o cpabe_2.so cpabe_2.cpp
