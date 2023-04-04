@@ -1,0 +1,5 @@
+department:cs
+age:20
+designation:student
+env-day:Tuesday
+env-device:macOS

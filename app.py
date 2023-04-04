@@ -73,7 +73,7 @@ def decrypt():
         os.mkdir(".dir/encrypted")
         os.mkdir(".dir/decrypted")
         f = request.files['attribute']
-        f.save(".dir/attribute.json")  
+        f.save(".dir/attribute.txt")  
         files = request.files.getlist("files")
   
         # Iterate for each file in the files List, and Save them

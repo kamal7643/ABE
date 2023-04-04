@@ -1,0 +1,11 @@
+{
+    "user-attribute":{
+        "department":"cs",
+        "age":20,
+        "designation":"student"
+    },
+    "env-attribute":{
+        "day":"Tuesday",
+        "device":"macOS"
+    }
+}

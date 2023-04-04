@@ -1,7 +1,8 @@
 #include <stdio.h>
+#include <math.h>
+#include <stdlib.h>
 #include <pbc/pbc.h>
 #include <glib.h>
-#include <stdlib.h>
 #include <assert.h>
 #include <string.h>
 #include <openssl/sha.h>
@@ -517,64 +518,63 @@ void spit_file(char *file, GByteArray *b, int free)
         g_byte_array_free(b, 1);
 }
 
-void read_cpabe_file( char* file,    GByteArray** cph_buf,
-											int* file_len, GByteArray** aes_buf )
+void read_cpabe_file(char *file, GByteArray **cph_buf,
+                     int *file_len, GByteArray **aes_buf)
 {
-	FILE* f;
-	int i;
-	int len;
+    FILE *f;
+    int i;
+    int len;
 
-	*cph_buf = g_byte_array_new();
-	*aes_buf = g_byte_array_new();
+    *cph_buf = g_byte_array_new();
+    *aes_buf = g_byte_array_new();
 
-	f = fopen_read_or_die(file);
+    f = fopen_read_or_die(file);
 
-	/* read real file len as 32-bit big endian int */
-	*file_len = 0;
-	for( i = 3; i >= 0; i-- )
-		*file_len |= fgetc(f)<<(i*8);
+    /* read real file len as 32-bit big endian int */
+    *file_len = 0;
+    for (i = 3; i >= 0; i--)
+        *file_len |= fgetc(f) << (i * 8);
 
-	/* read aes buf */
-	len = 0;
-	for( i = 3; i >= 0; i-- )
-		len |= fgetc(f)<<(i*8);
-	g_byte_array_set_size(*aes_buf, len);
-	fread((*aes_buf)->data, 1, len, f);
+    /* read aes buf */
+    len = 0;
+    for (i = 3; i >= 0; i--)
+        len |= fgetc(f) << (i * 8);
+    g_byte_array_set_size(*aes_buf, len);
+    fread((*aes_buf)->data, 1, len, f);
 
-	/* read cph buf */
-	len = 0;
-	for( i = 3; i >= 0; i-- )
-		len |= fgetc(f)<<(i*8);
-	g_byte_array_set_size(*cph_buf, len);
-	fread((*cph_buf)->data, 1, len, f);
-	
-	fclose(f);
+    /* read cph buf */
+    len = 0;
+    for (i = 3; i >= 0; i--)
+        len |= fgetc(f) << (i * 8);
+    g_byte_array_set_size(*cph_buf, len);
+    fread((*cph_buf)->data, 1, len, f);
+
+    fclose(f);
 }
 
-void
-write_cpabe_file( char* file,   GByteArray* cph_buf,
-									int file_len, GByteArray* aes_buf )
+void write_cpabe_file(char *file, GByteArray *cph_buf,
+                      int file_len, GByteArray *aes_buf)
 {
-	FILE* f;
-	int i;
+    FILE *f;
+    int i;
 
-	f = fopen_write_or_die(file);
+    f = fopen_write_or_die(file);
 
-	/* write real file len as 32-bit big endian int */
-	for( i = 3; i >= 0; i-- )
-		fputc((file_len & 0xff<<(i*8))>>(i*8), f);
+    /* write real file len as 32-bit big endian int */
+    for (i = 3; i >= 0; i--)
+        fputc((file_len & 0xff << (i * 8)) >> (i * 8), f);
 
-	/* write aes_buf */
-	for( i = 3; i >= 0; i-- )
-		fputc((aes_buf->len & 0xff<<(i*8))>>(i*8), f);
-	fwrite(aes_buf->data, 1, aes_buf->len, f);
+    /* write aes_buf */
+    for (i = 3; i >= 0; i--)
+        fputc((aes_buf->len & 0xff << (i * 8)) >> (i * 8), f);
+    fwrite(aes_buf->data, 1, aes_buf->len, f);
 
-	/* write cph_buf */
-	for( i = 3; i >= 0; i-- )
-		fputc((cph_buf->len & 0xff<<(i*8))>>(i*8), f);
-	fwrite(cph_buf->data, 1, cph_buf->len, f);
+    /* write cph_buf */
+    for (i = 3; i >= 0; i--)
+        fputc((cph_buf->len & 0xff << (i * 8)) >> (i * 8), f);
+    fwrite(cph_buf->data, 1, cph_buf->len, f);
 
-	fclose(f);
+    fclose(f);
 }
 
 void init_aes(element_t k, int enc, AES_KEY *key, unsigned char *iv)
@@ -868,381 +868,472 @@ int bswabe_dec(bswabe_pub_t *pub, bswabe_prv_t *prv, bswabe_cph_t *cph, element_
     return 1;
 }
 
-void
-serialize_uint32( GByteArray* b, uint32_t k )
+void serialize_uint32(GByteArray *b, uint32_t k)
 {
-	int i;
-	guint8 byte;
+    int i;
+    guint8 byte;
 
-	for( i = 3; i >= 0; i-- )
-	{
-		byte = (k & 0xff<<(i*8))>>(i*8);
-		g_byte_array_append(b, &byte, 1);
-	}
+    for (i = 3; i >= 0; i--)
+    {
+        byte = (k & 0xff << (i * 8)) >> (i * 8);
+        g_byte_array_append(b, &byte, 1);
+    }
 }
 
 uint32_t
-unserialize_uint32( GByteArray* b, int* offset )
+unserialize_uint32(GByteArray *b, int *offset)
 {
-	int i;
-	uint32_t r;
+    int i;
+    uint32_t r;
 
-	r = 0;
-	for( i = 3; i >= 0; i-- )
-		r |= (b->data[(*offset)++])<<(i*8);
+    r = 0;
+    for (i = 3; i >= 0; i--)
+        r |= (b->data[(*offset)++]) << (i * 8);
 
-	return r;
+    return r;
 }
 
-void
-serialize_element( GByteArray* b, element_t e )
+void serialize_element(GByteArray *b, element_t e)
 {
-	uint32_t len;
-	unsigned char* buf;
+    uint32_t len;
+    unsigned char *buf;
 
-	len = element_length_in_bytes(e);
-	serialize_uint32(b, len);
+    len = element_length_in_bytes(e);
+    serialize_uint32(b, len);
 
-	buf = (unsigned char*) malloc(len);
-	element_to_bytes(buf, e);
-	g_byte_array_append(b, buf, len);
-	free(buf);
+    buf = (unsigned char *)malloc(len);
+    element_to_bytes(buf, e);
+    g_byte_array_append(b, buf, len);
+    free(buf);
 }
 
-void
-unserialize_element( GByteArray* b, int* offset, element_t e )
+void unserialize_element(GByteArray *b, int *offset, element_t e)
 {
-	uint32_t len;
-	unsigned char* buf;
+    uint32_t len;
+    unsigned char *buf;
 
-	len = unserialize_uint32(b, offset);
+    len = unserialize_uint32(b, offset);
 
-	buf = (unsigned char*) malloc(len);
-	memcpy(buf, b->data + *offset, len);
-	*offset += len;
+    buf = (unsigned char *)malloc(len);
+    memcpy(buf, b->data + *offset, len);
+    *offset += len;
 
-	element_from_bytes(e, buf);
-	free(buf);
+    element_from_bytes(e, buf);
+    free(buf);
 }
 
-void
-serialize_string( GByteArray* b, char* s )
+void serialize_string(GByteArray *b, char *s)
 {
-	g_byte_array_append(b, (unsigned char*) s, strlen(s) + 1);
+    g_byte_array_append(b, (unsigned char *)s, strlen(s) + 1);
 }
 
-char*
-unserialize_string( GByteArray* b, int* offset )
+char *
+unserialize_string(GByteArray *b, int *offset)
 {
-	GString* s;
-	char* r;
-	char c;
+    GString *s;
+    char *r;
+    char c;
 
-	s = g_string_sized_new(32);
-	while( 1 )
-	{
-		c = b->data[(*offset)++];
-		if( c && c != EOF )
-			g_string_append_c(s, c);
-		else
-			break;
-	}
+    s = g_string_sized_new(32);
+    while (1)
+    {
+        c = b->data[(*offset)++];
+        if (c && c != EOF)
+            g_string_append_c(s, c);
+        else
+            break;
+    }
 
-	r = s->str;
-	g_string_free(s, 0);
+    r = s->str;
+    g_string_free(s, 0);
 
-	return r;
+    return r;
 }
 
-GByteArray*
-bswabe_pub_serialize( bswabe_pub_t* pub )
+GByteArray *
+bswabe_pub_serialize(bswabe_pub_t *pub)
 {
-	GByteArray* b;
+    GByteArray *b;
 
-	b = g_byte_array_new();
-	serialize_string(b,  pub->pairing_desc);
-	serialize_element(b, pub->g);
-	serialize_element(b, pub->h);
-	serialize_element(b, pub->gp);
-	serialize_element(b, pub->g_hat_alpha);
+    b = g_byte_array_new();
+    serialize_string(b, pub->pairing_desc);
+    serialize_element(b, pub->g);
+    serialize_element(b, pub->h);
+    serialize_element(b, pub->gp);
+    serialize_element(b, pub->g_hat_alpha);
 
-	return b;
+    return b;
 }
 
-bswabe_pub_t*
-bswabe_pub_unserialize( GByteArray* b, int free )
+bswabe_pub_t *
+bswabe_pub_unserialize(GByteArray *b, int free)
 {
-	bswabe_pub_t* pub;
-	int offset;
+    bswabe_pub_t *pub;
+    int offset;
 
-	pub = (bswabe_pub_t*) malloc(sizeof(bswabe_pub_t));
-	offset = 0;
+    pub = (bswabe_pub_t *)malloc(sizeof(bswabe_pub_t));
+    offset = 0;
 
-	pub->pairing_desc = unserialize_string(b, &offset);
-	pairing_init_set_buf(pub->p, pub->pairing_desc, strlen(pub->pairing_desc));
+    pub->pairing_desc = unserialize_string(b, &offset);
+    pairing_init_set_buf(pub->p, pub->pairing_desc, strlen(pub->pairing_desc));
 
-	element_init_G1(pub->g,           pub->p);
-	element_init_G1(pub->h,           pub->p);
-	element_init_G2(pub->gp,          pub->p);
-	element_init_GT(pub->g_hat_alpha, pub->p);
+    element_init_G1(pub->g, pub->p);
+    element_init_G1(pub->h, pub->p);
+    element_init_G2(pub->gp, pub->p);
+    element_init_GT(pub->g_hat_alpha, pub->p);
 
-	unserialize_element(b, &offset, pub->g);
-	unserialize_element(b, &offset, pub->h);
-	unserialize_element(b, &offset, pub->gp);
-	unserialize_element(b, &offset, pub->g_hat_alpha);
+    unserialize_element(b, &offset, pub->g);
+    unserialize_element(b, &offset, pub->h);
+    unserialize_element(b, &offset, pub->gp);
+    unserialize_element(b, &offset, pub->g_hat_alpha);
 
-	if( free )
-		g_byte_array_free(b, 1);
+    if (free)
+        g_byte_array_free(b, 1);
 
-	return pub;
+    return pub;
 }
 
-GByteArray*
-bswabe_msk_serialize( bswabe_msk_t* msk )
+GByteArray *
+bswabe_msk_serialize(bswabe_msk_t *msk)
 {
-	GByteArray* b;
+    GByteArray *b;
 
-	b = g_byte_array_new();
-	serialize_element(b, msk->beta);
-	serialize_element(b, msk->g_alpha);
+    b = g_byte_array_new();
+    serialize_element(b, msk->beta);
+    serialize_element(b, msk->g_alpha);
 
-	return b;
+    return b;
 }
 
-bswabe_msk_t*
-bswabe_msk_unserialize( bswabe_pub_t* pub, GByteArray* b, int free )
+bswabe_msk_t *
+bswabe_msk_unserialize(bswabe_pub_t *pub, GByteArray *b, int free)
 {
-	bswabe_msk_t* msk;
-	int offset;
+    bswabe_msk_t *msk;
+    int offset;
 
-	msk = (bswabe_msk_t*) malloc(sizeof(bswabe_msk_t));
-	offset = 0;
+    msk = (bswabe_msk_t *)malloc(sizeof(bswabe_msk_t));
+    offset = 0;
 
-	element_init_Zr(msk->beta, pub->p);
-	element_init_G2(msk->g_alpha, pub->p);
+    element_init_Zr(msk->beta, pub->p);
+    element_init_G2(msk->g_alpha, pub->p);
 
-	unserialize_element(b, &offset, msk->beta);
-	unserialize_element(b, &offset, msk->g_alpha);
+    unserialize_element(b, &offset, msk->beta);
+    unserialize_element(b, &offset, msk->g_alpha);
 
-	if( free )
-		g_byte_array_free(b, 1);
+    if (free)
+        g_byte_array_free(b, 1);
 
-	return msk;
+    return msk;
 }
 
-GByteArray*
-bswabe_prv_serialize( bswabe_prv_t* prv )
+GByteArray *
+bswabe_prv_serialize(bswabe_prv_t *prv)
 {
-	GByteArray* b;
-	int i;
+    GByteArray *b;
+    int i;
 
-	b = g_byte_array_new();
+    b = g_byte_array_new();
 
-	serialize_element(b, prv->d);
-	serialize_uint32( b, prv->comps->len);
+    serialize_element(b, prv->d);
+    serialize_uint32(b, prv->comps->len);
 
-	for( i = 0; i < prv->comps->len; i++ )
-	{
-		serialize_string( b, g_array_index(prv->comps, bswabe_prv_comp_t, i).attr);
-		serialize_element(b, g_array_index(prv->comps, bswabe_prv_comp_t, i).d);
-		serialize_element(b, g_array_index(prv->comps, bswabe_prv_comp_t, i).dp);
-	}
+    for (i = 0; i < prv->comps->len; i++)
+    {
+        serialize_string(b, g_array_index(prv->comps, bswabe_prv_comp_t, i).attr);
+        serialize_element(b, g_array_index(prv->comps, bswabe_prv_comp_t, i).d);
+        serialize_element(b, g_array_index(prv->comps, bswabe_prv_comp_t, i).dp);
+    }
 
-	return b;
+    return b;
 }
 
-bswabe_prv_t*
-bswabe_prv_unserialize( bswabe_pub_t* pub, GByteArray* b, int free )
+bswabe_prv_t *
+bswabe_prv_unserialize(bswabe_pub_t *pub, GByteArray *b, int free)
 {
-	bswabe_prv_t* prv;
-	int i;
-	int len;
-	int offset;
+    bswabe_prv_t *prv;
+    int i;
+    int len;
+    int offset;
 
-	prv = (bswabe_prv_t*) malloc(sizeof(bswabe_prv_t));
-	offset = 0;
+    prv = (bswabe_prv_t *)malloc(sizeof(bswabe_prv_t));
+    offset = 0;
 
-	element_init_G2(prv->d, pub->p);
-	unserialize_element(b, &offset, prv->d);
+    element_init_G2(prv->d, pub->p);
+    unserialize_element(b, &offset, prv->d);
 
-	prv->comps = g_array_new(0, 1, sizeof(bswabe_prv_comp_t));
-	len = unserialize_uint32(b, &offset);
+    prv->comps = g_array_new(0, 1, sizeof(bswabe_prv_comp_t));
+    len = unserialize_uint32(b, &offset);
 
-	for( i = 0; i < len; i++ )
-	{
-		bswabe_prv_comp_t c;
+    for (i = 0; i < len; i++)
+    {
+        bswabe_prv_comp_t c;
 
-		c.attr = unserialize_string(b, &offset);
+        c.attr = unserialize_string(b, &offset);
 
-		element_init_G2(c.d,  pub->p);
-		element_init_G2(c.dp, pub->p);
+        element_init_G2(c.d, pub->p);
+        element_init_G2(c.dp, pub->p);
 
-		unserialize_element(b, &offset, c.d);
-		unserialize_element(b, &offset, c.dp);
+        unserialize_element(b, &offset, c.d);
+        unserialize_element(b, &offset, c.dp);
 
-		g_array_append_val(prv->comps, c);
-	}
+        g_array_append_val(prv->comps, c);
+    }
 
-	if( free )
-		g_byte_array_free(b, 1);
+    if (free)
+        g_byte_array_free(b, 1);
 
-	return prv;
+    return prv;
 }
 
-void
-serialize_policy( GByteArray* b, bswabe_policy_t* p )
+void serialize_policy(GByteArray *b, bswabe_policy_t *p)
 {
-	int i;
+    int i;
 
-	serialize_uint32(b, (uint32_t) p->k);
+    serialize_uint32(b, (uint32_t)p->k);
 
-	serialize_uint32(b, (uint32_t) p->children->len);
-	if( p->children->len == 0 )
-	{
-		serialize_string( b, p->attr);
-		serialize_element(b, p->c);
-		serialize_element(b, p->cp);
-	}
-	else
-		for( i = 0; i < p->children->len; i++ )
-			serialize_policy(b, g_ptr_array_index(p->children, i));
+    serialize_uint32(b, (uint32_t)p->children->len);
+    if (p->children->len == 0)
+    {
+        serialize_string(b, p->attr);
+        serialize_element(b, p->c);
+        serialize_element(b, p->cp);
+    }
+    else
+        for (i = 0; i < p->children->len; i++)
+            serialize_policy(b, g_ptr_array_index(p->children, i));
 }
 
-bswabe_policy_t*
-unserialize_policy( bswabe_pub_t* pub, GByteArray* b, int* offset )
+bswabe_policy_t *
+unserialize_policy(bswabe_pub_t *pub, GByteArray *b, int *offset)
 {
-	int i;
-	int n;
-	bswabe_policy_t* p;
+    int i;
+    int n;
+    bswabe_policy_t *p;
 
-	p = (bswabe_policy_t*) malloc(sizeof(bswabe_policy_t));
+    p = (bswabe_policy_t *)malloc(sizeof(bswabe_policy_t));
 
-	p->k = (int) unserialize_uint32(b, offset);
-	p->attr = 0;
-	p->children = g_ptr_array_new();
+    p->k = (int)unserialize_uint32(b, offset);
+    p->attr = 0;
+    p->children = g_ptr_array_new();
 
-	n = unserialize_uint32(b, offset);
-	if( n == 0 )
-	{
-		p->attr = unserialize_string(b, offset);
-		element_init_G1(p->c,  pub->p);
-		element_init_G1(p->cp, pub->p);
-		unserialize_element(b, offset, p->c);
-		unserialize_element(b, offset, p->cp);
-	}
-	else
-		for( i = 0; i < n; i++ )
-			g_ptr_array_add(p->children, unserialize_policy(pub, b, offset));
+    n = unserialize_uint32(b, offset);
+    if (n == 0)
+    {
+        p->attr = unserialize_string(b, offset);
+        element_init_G1(p->c, pub->p);
+        element_init_G1(p->cp, pub->p);
+        unserialize_element(b, offset, p->c);
+        unserialize_element(b, offset, p->cp);
+    }
+    else
+        for (i = 0; i < n; i++)
+            g_ptr_array_add(p->children, unserialize_policy(pub, b, offset));
 
-	return p;
+    return p;
 }
 
-GByteArray*
-bswabe_cph_serialize( bswabe_cph_t* cph )
+GByteArray *
+bswabe_cph_serialize(bswabe_cph_t *cph)
 {
-	GByteArray* b;
+    GByteArray *b;
 
-	b = g_byte_array_new();
-	serialize_element(b, cph->cs);
-	serialize_element(b, cph->c);
-	serialize_policy( b, cph->p);
+    b = g_byte_array_new();
+    serialize_element(b, cph->cs);
+    serialize_element(b, cph->c);
+    serialize_policy(b, cph->p);
 
-	return b;
+    return b;
 }
 
-bswabe_cph_t*
-bswabe_cph_unserialize( bswabe_pub_t* pub, GByteArray* b, int free )
+bswabe_cph_t *
+bswabe_cph_unserialize(bswabe_pub_t *pub, GByteArray *b, int free)
 {
-	bswabe_cph_t* cph;
-	int offset;
+    bswabe_cph_t *cph;
+    int offset;
 
-	cph = (bswabe_cph_t*) malloc(sizeof(bswabe_cph_t));
-	offset = 0;
+    cph = (bswabe_cph_t *)malloc(sizeof(bswabe_cph_t));
+    offset = 0;
 
-	element_init_GT(cph->cs, pub->p);
-	element_init_G1(cph->c,  pub->p);
-	unserialize_element(b, &offset, cph->cs);
-	unserialize_element(b, &offset, cph->c);
-	cph->p = unserialize_policy(pub, b, &offset);
+    element_init_GT(cph->cs, pub->p);
+    element_init_G1(cph->c, pub->p);
+    unserialize_element(b, &offset, cph->cs);
+    unserialize_element(b, &offset, cph->c);
+    cph->p = unserialize_policy(pub, b, &offset);
 
-	if( free )
-		g_byte_array_free(b, 1);
+    if (free)
+        g_byte_array_free(b, 1);
 
-	return cph;
+    return cph;
 }
 
-void
-bswabe_pub_free( bswabe_pub_t* pub )
+void bswabe_pub_free(bswabe_pub_t *pub)
 {
-	element_clear(pub->g);
-	element_clear(pub->h);
-	element_clear(pub->gp);
-	element_clear(pub->g_hat_alpha);
-	pairing_clear(pub->p);
-	free(pub->pairing_desc);
-	free(pub);
+    element_clear(pub->g);
+    element_clear(pub->h);
+    element_clear(pub->gp);
+    element_clear(pub->g_hat_alpha);
+    pairing_clear(pub->p);
+    free(pub->pairing_desc);
+    free(pub);
 }
 
-void
-bswabe_msk_free( bswabe_msk_t* msk )
+void bswabe_msk_free(bswabe_msk_t *msk)
 {
-	element_clear(msk->beta);
-	element_clear(msk->g_alpha);
-	free(msk);
+    element_clear(msk->beta);
+    element_clear(msk->g_alpha);
+    free(msk);
 }
 
-void
-bswabe_prv_free( bswabe_prv_t* prv )
+void bswabe_prv_free(bswabe_prv_t *prv)
 {
-	int i;
-	
-	element_clear(prv->d);
+    int i;
 
-	for( i = 0; i < prv->comps->len; i++ )
-	{
-		bswabe_prv_comp_t c;
+    element_clear(prv->d);
 
-		c = g_array_index(prv->comps, bswabe_prv_comp_t, i);
-		free(c.attr);
-		element_clear(c.d);
-		element_clear(c.dp);
-	}
+    for (i = 0; i < prv->comps->len; i++)
+    {
+        bswabe_prv_comp_t c;
 
-	g_array_free(prv->comps, 1);
+        c = g_array_index(prv->comps, bswabe_prv_comp_t, i);
+        free(c.attr);
+        element_clear(c.d);
+        element_clear(c.dp);
+    }
 
-	free(prv);
+    g_array_free(prv->comps, 1);
+
+    free(prv);
 }
 
-void
-bswabe_policy_free( bswabe_policy_t* p )
+void bswabe_policy_free(bswabe_policy_t *p)
 {
-	int i;
+    int i;
 
-	if( p->attr )
-	{
-		free(p->attr);
-		element_clear(p->c);
-		element_clear(p->cp);
-	}
+    if (p->attr)
+    {
+        free(p->attr);
+        element_clear(p->c);
+        element_clear(p->cp);
+    }
 
-	for( i = 0; i < p->children->len; i++ )
-		bswabe_policy_free(g_ptr_array_index(p->children, i));
+    for (i = 0; i < p->children->len; i++)
+        bswabe_policy_free(g_ptr_array_index(p->children, i));
 
-	g_ptr_array_free(p->children, 1);
+    g_ptr_array_free(p->children, 1);
 
-	free(p);
+    free(p);
 }
 
-void
-bswabe_cph_free( bswabe_cph_t* cph )
+void bswabe_cph_free(bswabe_cph_t *cph)
 {
-	element_clear(cph->cs);
-	element_clear(cph->c);
-	bswabe_policy_free(cph->p);
+    element_clear(cph->cs);
+    element_clear(cph->c);
+    bswabe_policy_free(cph->p);
 }
 
+char **get_user_attrs(int *len)
+{
+    GByteArray *b = suck_file((char *)"../.ABE_DIR/attribute.txt");
+    int n;
+    char *attrs = unserialize_string(b, &n);
 
+    char **a = (char **)malloc(sizeof(char *) * n);
 
+    int i;
+    int j = 0;
+    int k = 0;
+    for (i = 0; i < n; i++)
+    {
+
+        if (i == 0)
+        {
+            a[0] = (char *)malloc(sizeof(char) * n);
+        }
+        if (attrs[i] == '\n')
+        {
+            k++;
+            a[k] = (char *)malloc(sizeof(char) * n);
+            j = 0;
+        }
+        else
+        {
+            a[k][j++] = attrs[i];
+        }
+    }
+    k++;
+    *len = k;
+    return a;
+}
+
+char *itoa(int num, char *buffer, int base)
+{
+    int current = 0;
+    if (num == 0)
+    {
+        buffer[current++] = '0';
+        buffer[current] = '\0';
+        return buffer;
+    }
+    int num_digits = 0;
+    if (num < 0)
+    {
+        if (base == 10)
+        {
+            num_digits++;
+            buffer[current] = '-';
+            current++;
+            num *= -1;
+        }
+        else
+            return NULL;
+    }
+    num_digits += (int)floor(log(num) / log(base)) + 1;
+    while (current < num_digits)
+    {
+        int base_val = (int)pow(base, num_digits - 1 - current);
+        int num_val = num / base_val;
+        char value = num_val + '0';
+        buffer[current] = value;
+        current++;
+        num -= base_val * num_val;
+    }
+    buffer[current] = '\0';
+    return buffer;
+}
+
+char *get_encryption_rule()
+{
+    char *policy;
+    int n;
+    GByteArray *b = suck_file((char *)"../.ABE_DIR/rules.txt");
+    policy = unserialize_string(b, &n);
+    int i;
+    int j=0;
+    int k=0;
+    for(i=0; i<n; i++){
+        // printf("%d\t%c\n", policy[i], policy[i]);
+        if(policy[i]==13){
+            policy[j]=' ';
+            j++;
+            }
+        else if(policy[i]==10 || policy[i]==0){
+            // printf("here");
+            // printf("%d\t%c\n", policy[i], policy[i]);
+            // j--;
+            k++;
+        }else{
+            policy[j]=policy[i];
+            j++;
+        }
+    }
+    policy[j]=' ';
+    policy[++j]='1';
+    policy[++j]='o';
+    policy[++j]='f';
+    policy[++j]='0'+k;
+    // printf("%s", policy);
+    return policy;
+}
 
 // int main()
 // {
@@ -1290,28 +1381,27 @@ bswabe_cph_free( bswabe_cph_t* cph )
 //     return 0;
 // }
 
-    char *pub_file = (char *)".ABE_DIR/pub_key";
-    char *msk_file = (char *)".ABE_DIR/master_key";
-    char *prv_file = (char *)".ABE_DIR/prv_key";
-    // char *in_file ;
-    // char *out_file;
-    // char *dec_file ;
-    bswabe_pub_t *pub;
-    bswabe_msk_t *msk;
-    bswabe_prv_t *prv;
-    bswabe_cph_t *cph;
-    element_t m;
-    GByteArray *aes_buf;
-    GByteArray *cph_buf;
-    GByteArray *plt;
-    int file_len;
-    element_t m1;
-
+char *pub_file = (char *)".ABE_DIR/pub_key";
+char *msk_file = (char *)".ABE_DIR/master_key";
+char *prv_file = (char *)".ABE_DIR/prv_key";
+// char *in_file ;
+// char *out_file;
+// char *dec_file ;
+bswabe_pub_t *pub;
+bswabe_msk_t *msk;
+bswabe_prv_t *prv;
+bswabe_cph_t *cph;
+element_t m;
+GByteArray *aes_buf;
+GByteArray *cph_buf;
+GByteArray *plt;
+int file_len;
+element_t m1;
 
 void setup()
 {
     bswabe_setup(&pub, &msk);
-    // time_t t;   
+    // time_t t;
     // time(&t);
     // printf("\nSetup completed at : %s", ctime(&t));
     spit_file(pub_file, bswabe_pub_serialize(pub), 1);
@@ -1328,15 +1418,17 @@ void keygen()
     attrs[1] = (char *)malloc(sizeof(char) * 50);
     attrs[0] = (char *)"name:kamal";
     attrs[1] = (char *)"age:20";
+    int n;
+    attrs = get_user_attrs(&n;);
     pub = bswabe_pub_unserialize(suck_file(pub_file), 1);
     msk = bswabe_msk_unserialize(pub, suck_file(msk_file), 1);
-    prv = bswabe_keygen(pub, msk, attrs, 2);
+    prv = bswabe_keygen(pub, msk, attrs, n);
     spit_file(prv_file, bswabe_prv_serialize(prv), 1);
     printf("Private key is in : %s\n", prv_file);
     printf("Keygen done ...\n");
 }
 
-void enc(const char * in_file, const char * out_file)
+void enc(const char *in_file, const char *out_file)
 {
     // in_file = (char *)malloc(sizeof(char)*100);
     // out_file = (char *)malloc(sizeof(char)*100);
@@ -1349,6 +1441,7 @@ void enc(const char * in_file, const char * out_file)
     pub = bswabe_pub_unserialize(suck_file(pub_file), 1);
     char *policy = (char *)malloc(sizeof(char) * 100);
     policy = (char *)"name:kamal age:20 2of2";
+    policy = get_encryption_rule();
     printf("Policy : [%s]\n", policy);
     cph = bswabe_enc(pub, &m, policy);
     cph_buf = bswabe_cph_serialize(cph);
@@ -1359,7 +1452,7 @@ void enc(const char * in_file, const char * out_file)
     printf("Encryption done ...\n");
 }
 
-void dec(const char * out_file, const char * dec_file)
+void dec(const char *out_file, const char *dec_file)
 {
     // out_file = (char *)".ABE_DIR/encryption/";
     // strcat(out_file, (char *)filename);
@@ -1368,19 +1461,20 @@ void dec(const char * out_file, const char * dec_file)
     // strcat(dec_file, (char *)filename);
     pub = bswabe_pub_unserialize(suck_file(pub_file), 1);
     prv = bswabe_prv_unserialize(pub, suck_file(prv_file), 1);
-    read_cpabe_file(out_file, &cph_buf, &file_len, &aes_buf );
-    cph =bswabe_cph_unserialize(pub, cph_buf, 1);
+    read_cpabe_file(out_file, &cph_buf, &file_len, &aes_buf);
+    cph = bswabe_cph_unserialize(pub, cph_buf, 1);
     if (!bswabe_dec(pub, prv, cph, &m1))
     {
         printf("error");
-        return ;
+        return;
     }
     GByteArray *plt1 = aes_128_cbc_decrypt(aes_buf, m1);
     spit_file(dec_file, plt1, 1);
     printf("Dncryption done ...\n");
 }
 
-void reciver(const char * str){
+void reciver(const char *str)
+{
     printf("msg recived : %s\n", str);
 }
 
@@ -1389,7 +1483,17 @@ int main()
     printf("main function doing nothing\n");
     return 0;
 }
+// int main()
+// {
 
+//     int k;
+//     char *s1 = get_encryption_rule();
+//     char **s2 = get_user_attrs(&k);
+//     // printf("%s", s1);
+//     return 0;
+// }
 /*
  gcc -I/opt/homebrew/include/glib-2.0/ -I/opt/homebrew//Cellar/glib/2.76.1/lib/glib-2.0/include/ -I/opt/homebrew/Cellar/openssl@3/3.1.0/include/ -I/opt/homebrew/Cellar/openssl@3/3.1.0/include/openssl/ -fPIC -shared -o app.so app.c -L. -lgmp -lpbc -lcrypto `pkg-config --cflags --libs glib-2.0`
+
+  gcc -I/opt/homebrew/include/glib-2.0/ -I/opt/homebrew//Cellar/glib/2.76.1/lib/glib-2.0/include/ -I/opt/homebrew/Cellar/openssl@3/3.1.0/include/ -I/opt/homebrew/Cellar/openssl@3/3.1.0/include/openssl/ -fPIC -shared -o app.so app.c -L. -lgmp -lpbc -lcrypto `pkg-config --cflags --libs glib-2.0`
 */
