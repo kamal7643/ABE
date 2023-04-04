@@ -30,6 +30,9 @@
 ## install requirements
 ```pip install -r requirements.txt```
 
+### ngrok
+``` ngrok http 5000 ```
+
 ## start flask servers
 ```python app.py
 

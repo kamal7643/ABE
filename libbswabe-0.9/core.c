@@ -7,7 +7,7 @@
 
 #include <openssl/sha.h>
 #include <glib.h>
-#include <pbc.h>
+#include <pbc/pbc.h>
 
 #include "bswabe.h"
 #include "private.h"

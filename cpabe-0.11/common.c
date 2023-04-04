@@ -122,8 +122,7 @@ fopen_write_or_die( char* file )
 	return f;
 }
 
-GByteArray*
-suck_file( char* file )
+GByteArray* suck_file( char* file )
 {
 	FILE* f;
 	GByteArray* a;
@@ -140,8 +139,7 @@ suck_file( char* file )
 	return a;
 }
 
-char*
-suck_file_str( char* file )
+char* suck_file_str( char* file )
 {
 	GByteArray* a;
 	char* s;

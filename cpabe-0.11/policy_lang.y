@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <glib.h>
-#include <pbc.h>
+#include <pbc/pbc.h>
 
 #include "common.h"
 #include "policy_lang.h"
@@ -99,10 +99,10 @@ expint( uint64_t value, uint64_t bits )
 	sized_integer_t* s;
 
 	if( bits == 0 )
-		die("error parsing policy: zero-length integer \"%llub%llu\"\n",
+		printf("error parsing policy: zero-length integer \"%llub%llu\"\n",
 				value, bits);
 	else if( bits > 64 )
-		die("error parsing policy: no more than 64 bits allowed \"%llub%llu\"\n",
+		printf("error parsing policy: no more than 64 bits allowed \"%llub%llu\"\n",
 				value, bits);
 
 	s = malloc(sizeof(sized_integer_t));
@@ -173,12 +173,12 @@ kof_policy( int k, GPtrArray* list )
 	cpabe_policy_t* p;
 
 	if( k < 1 )
-		die("error parsing policy: trivially satisfied operator \"%dof\"\n", k);
+		printf("error parsing policy: trivially satisfied operator \"%dof\"\n", k);
 	else if( k > list->len )
-		die("error parsing policy: unsatisfiable operator \"%dof\" (only %d operands)\n",
+		printf("error parsing policy: unsatisfiable operator \"%dof\" (only %d operands)\n",
 				k, list->len);
 	else if( list->len == 1 )
-		die("error parsing policy: identity operator \"%dof\" (only one operand)\n", k);
+		printf("error parsing policy: identity operator \"%dof\" (only one operand)\n", k);
 
 	p = (cpabe_policy_t*) malloc(sizeof(cpabe_policy_t));
 	p->k = k;
@@ -284,14 +284,14 @@ cmp_policy( sized_integer_t* n, int gt, char* attr )
 	/* some error checking */
 
 	if( gt && n->value >= ((uint64_t)1<<(n->bits ? n->bits : 64)) - 1 )
-		die("error parsing policy: unsatisfiable integer comparison %s > %llu\n"
+		printf("error parsing policy: unsatisfiable integer comparison %s > %llu\n"
 				"(%d-bits are insufficient to satisfy)\n", attr, n->value,
 				n->bits ? n->bits : 64);
 	else if( !gt && n->value == 0 )
-		die("error parsing policy: unsatisfiable integer comparison %s < 0\n"
+		printf("error parsing policy: unsatisfiable integer comparison %s < 0\n"
 				"(all numerical attributes are unsigned)\n", attr);
 	else if( !gt && n->value > ((uint64_t)1<<(n->bits ? n->bits : 64)) - 1 )
-		die("error parsing policy: trivially satisfied integer comparison %s < %llu\n"
+		printf("error parsing policy: trivially satisfied integer comparison %s < %llu\n"
 				"(any %d-bit number will satisfy)\n", attr, n->value,
 				n->bits ? n->bits : 64);
 
@@ -426,7 +426,7 @@ yylex()
 		}
 	}
 	else
-		die("syntax error at \"%c%s\"\n", c, cur_string);
+		printf("syntax error at \"%c%s\"\n", c, cur_string);
 
 	return r;
 }
@@ -434,7 +434,7 @@ yylex()
 void
 yyerror( const char* s )
 {
-  die("error parsing policy: %s\n", s);
+  printf("error parsing policy: %s\n", s);
 }
 
 #define POLICY_IS_OR(p)  (((cpabe_policy_t*)(p))->k == 1 && ((cpabe_policy_t*)(p))->children->len)
@@ -579,11 +579,11 @@ parse_attribute( GSList** l, char* a )
 			/* expint */
 
 			if( bits > 64 )
-				die("error parsing attribute \"%s\": 64 bits is the maximum allowed\n",
+				printf("error parsing attribute \"%s\": 64 bits is the maximum allowed\n",
 						a, value, bits);
 
 			if( value >= ((uint64_t)1<<bits) )
-				die("error parsing attribute \"%s\": value %llu too big for %d bits\n",
+				printf("error parsing attribute \"%s\": value %llu too big for %d bits\n",
 						a, value, bits);
 
 			tplate = g_strdup_printf("%%s_expint%02d_%%s%%d%%s", bits);
@@ -612,7 +612,7 @@ parse_attribute( GSList** l, char* a )
 				(*l, g_strdup_printf("%s_flexint_%llu", s, value));
 		}
 		else
-			die("error parsing attribute \"%s\"\n"
+			printf("error parsing attribute \"%s\"\n"
 					"(note that numerical attributes are unsigned integers)\n",	a);
 
  		free(s);
