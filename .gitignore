@@ -6,3 +6,4 @@ bin/*
 .VSCodeCounter/*
 .idea/*
 venv/*
+*/*/.vscode

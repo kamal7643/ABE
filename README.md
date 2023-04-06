@@ -31,12 +31,10 @@
 ```pip install -r requirements.txt```
 
 ### ngrok
-``` ngrok http 5000 ```
+```ngrok http 5000 ```
 
 ## start flask servers
-```python app.py
-
-```
+```python app.py```
 
 # flask application
 ## paths
@@ -60,6 +58,7 @@
 
 
 # cpp and python
+ ```gcc -I/opt/homebrew/include/glib-2.0/ -I/opt/homebrew//Cellar/glib/2.76.1/lib/glib-2.0/include/ -I/opt/homebrew/Cellar/openssl@3/3.1.0/include/ -I/opt/homebrew/Cellar/openssl@3/3.1.0/include/openssl/ -fPIC -shared -o app.so app.c -L. -lgmp -lpbc -lcrypto `pkg-config --cflags --libs glib-2.0` ```
 
-g++ -fPIC -shared -o myclass.so myclass.cpp
-g++ -fPIC -shared -o cpabe_2.so cpabe_2.cpp
+
+ ```python app2.py ```

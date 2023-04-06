@@ -13,14 +13,14 @@
 #include <time.h>
 
 #define MAX_LINE_LENGTH 1000
-#define KNRM  "\x1B[0m"
-#define KRED  "\x1B[31m"
-#define KGRN  "\x1B[32m"
-#define KYEL  "\x1B[33m"
-#define KBLU  "\x1B[34m"
-#define KMAG  "\x1B[35m"
-#define KCYN  "\x1B[36m"
-#define KWHT  "\x1B[37m"
+#define KNRM "\x1B[0m"
+#define KRED "\x1B[31m"
+#define KGRN "\x1B[32m"
+#define KYEL "\x1B[33m"
+#define KBLU "\x1B[34m"
+#define KMAG "\x1B[35m"
+#define KCYN "\x1B[36m"
+#define KWHT "\x1B[37m"
 #define TYPE_A_PARAMS                                          \
     "type a\n"                                                 \
     "q 87807107996633125224377819847540498158068831994142082"  \
@@ -1244,26 +1244,31 @@ void bswabe_cph_free(bswabe_cph_t *cph)
 
 char **get_user_attrs(int *len)
 {
-    FILE    *textfile;
-    char    line[MAX_LINE_LENGTH];
-    char ** attrs = (char ** )malloc(sizeof(char *)*20);
+    FILE *textfile;
+    char line[MAX_LINE_LENGTH];
+    char **attrs = (char **)malloc(sizeof(char *) * 20);
     textfile = fopen("/Users/kamalswami/Documents/ABE/.ABE_DIR/attribute.txt", "r");
-    if(textfile == NULL){
+    if (textfile == NULL)
+    {
         printf("cannot read attributes |||");
         exit(1);
     }
-    int k=0;
-    while(fgets(line, MAX_LINE_LENGTH, textfile)){
-        attrs[k]=(char *)malloc(sizeof(char)*(strlen(line)));
+    int k = 0;
+    while (fgets(line, MAX_LINE_LENGTH, textfile))
+    {
+        attrs[k] = (char *)malloc(sizeof(char) * (strlen(line)));
         // strcat(attrs[k], line);
-        int i, l= strlen(line);
-        int j=0;
-        
-        for(i=0; i<l; i++){
-            if(line[i]==10 || line[i]==13){
+        int i, l = strlen(line);
+        int j = 0;
 
-            }else{
-                attrs[k][j]=line[i];
+        for (i = 0; i < l; i++)
+        {
+            if (line[i] == 10 || line[i] == 13)
+            {
+            }
+            else
+            {
+                attrs[k][j] = line[i];
                 j++;
             }
         }
@@ -1271,7 +1276,7 @@ char **get_user_attrs(int *len)
         k++;
     }
     fclose(textfile);
-    *len =k;
+    *len = k;
     return attrs;
 }
 
@@ -1313,32 +1318,40 @@ char *itoa(int num, char *buffer, int base)
 
 char *get_encryption_rule()
 {
-    FILE    *textfile;
-    char    line[MAX_LINE_LENGTH];
-    char ** attrs = (char ** )malloc(sizeof(char *)*20);
+    FILE *textfile;
+    char line[MAX_LINE_LENGTH];
+    char **attrs = (char **)malloc(sizeof(char *) * 20);
     textfile = fopen("/Users/kamalswami/Documents/ABE/.ABE_DIR/rules.txt", "r");
-    if(textfile == NULL){
+    if (textfile == NULL)
+    {
         printf("cannot read rules |||");
         exit(1);
     }
-    char * rule = (char *)malloc(sizeof(char)*MAX_LINE_LENGTH);
-    int k=0;
-    while(fgets(line, MAX_LINE_LENGTH, textfile)){
-        char * imp = (char *)malloc(sizeof(char)*strlen(line));
-        int j=0;
+    char *rule = (char *)malloc(sizeof(char) * MAX_LINE_LENGTH);
+    int k = 0;
+    while (fgets(line, MAX_LINE_LENGTH, textfile))
+    {
+        char *imp = (char *)malloc(sizeof(char) * strlen(line));
+        int j = 0;
         int l = strlen(line);
         int i;
-        for(i=0; i<l; i++){
-            if(line[i]==10 || line[i]==13){
-
-            }else{
-                imp[j]=line[i];
+        for (i = 0; i < l; i++)
+        {
+            if (line[i] == 10 || line[i] == 13)
+            {
+            }
+            else
+            {
+                imp[j] = line[i];
                 j++;
             }
         }
-        if(k==0){
+        if (k == 0)
+        {
             strcat(rule, imp);
-        }else{
+        }
+        else
+        {
             strcat(rule, " ");
             strcat(rule, imp);
         }
@@ -1346,11 +1359,10 @@ char *get_encryption_rule()
         k++;
     }
     strcat(rule, " 1of");
-    rule[strlen(rule)]='0'+k;
+    rule[strlen(rule)] = '0' + k;
     // printf("new : %s\n",rule);
     fclose(textfile);
     return rule;
-
 
     // char *policy;
     // int n;
@@ -1388,69 +1400,88 @@ char *get_encryption_rule()
     // return policy;
 }
 
-
-char ** get_object_attrs(int *len, char *file){
-    char ** attrs=(char **)malloc(sizeof(char *)*2);
+char **get_object_attrs(int *len, char *file)
+{
+    char **attrs = (char **)malloc(sizeof(char *) * 2);
     char *ext = strrchr(file, '.');
-    if (ext == NULL) {
+    if (ext == NULL)
+    {
         printf("File has no extension\n");
-    } else {
+    }
+    else
+    {
         // printf("File extension: %s\n", ext+1);
     }
-    attrs[0]=(char *)malloc(sizeof(char)*20);
+    attrs[0] = (char *)malloc(sizeof(char) * 20);
     strcat(attrs[0], "obj-type:");
-    strcat(attrs[0], ext+1);
+    strcat(attrs[0], ext + 1);
 
     struct stat sb;
-    if (stat(file, &sb) == -1) {
+    if (stat(file, &sb) == -1)
+    {
         printf("error stat");
         return attrs;
     }
     // printf("File size: %lld bytes\n", sb.st_size);
-    attrs[1]=(char *)malloc(sizeof(char)*20);
+    attrs[1] = (char *)malloc(sizeof(char) * 20);
     strcat(attrs[1], "obj-size:");
     char str[100];
     strcat(attrs[1], itoa(sb.st_size, str, 10));
     strcat(attrs[1], "b");
-    *len =2;
+    *len = 2;
     return attrs;
 }
 
-int sim_bswabe_policy(bswabe_policy_t * p, char **obj_attrs, int len){
-    int rem =0;
+int sim_bswabe_policy(bswabe_policy_t *p, char **obj_attrs, int len)
+{
+    int rem = 0;
     int i;
     int count = p->children->len;
     // printf("%s%s%s", KGRN, p->attr, KNRM);
-    if(count==0){
-        
-        for(i=0; i<len; i++){
-            if(strcmp(p->attr, obj_attrs[i])==0){
+    if (count == 0)
+    {
+
+        for (i = 0; i < len; i++)
+        {
+            if (strcmp(p->attr, obj_attrs[i]) == 0)
+            {
                 p->k--;
                 rem++;
             }
         }
-    }else{
-        for(i=0; i<count; i++){
+    }
+    else
+    {
+        for (i = 0; i < count; i++)
+        {
             rem = sim_bswabe_policy(g_ptr_array_index(p->children, i), obj_attrs, len);
-            p->k-=rem;
-            rem=0;
+            p->k -= rem;
+            rem = 0;
         }
     }
 
     return rem;
 }
 
-char * policy_to_string(bswabe_policy_t* p){
-    char * st = (char *)malloc(sizeof(char)*MAX_LINE_LENGTH);
+char *policy_to_string(bswabe_policy_t *p)
+{
+    char *st = (char *)malloc(sizeof(char) * MAX_LINE_LENGTH);
     int count = p->children->len;
-    if(count==0){
+    if (count == 0)
+    {
         strcat(st, p->attr);
-    }else{
+    }
+    else
+    {
         int i;
-        for(i=0; i<count; i++){
-            if(strlen(st)==0){
+        for (i = 0; i < count; i++)
+        {
+            if (strlen(st) == 0)
+            {
                 strcat(st, policy_to_string(g_ptr_array_index(p->children, i)));
-            }else{
+            }
+            else
+            {
                 strcat(st, " ");
                 strcat(st, policy_to_string(g_ptr_array_index(p->children, i)));
             }
@@ -1465,25 +1496,24 @@ char * policy_to_string(bswabe_policy_t* p){
     return st;
 }
 
-char * simplify_policy(char *policy, char ** obj_attrs, int len){
+char *simplify_policy(char *policy, char **obj_attrs, int len)
+{
 
     int i;
     printf("File : [");
-    for(i=0; i<len; i++){
-        if(i!=0)printf("   ");
+    for (i = 0; i < len; i++)
+    {
+        if (i != 0)
+            printf("   ");
         printf("%s", obj_attrs[i]);
     }
     printf("]\n");
 
     bswabe_policy_t *p = parse_policy_postfix(policy);
-    int x =sim_bswabe_policy(p,  obj_attrs, len);
+    int x = sim_bswabe_policy(p, obj_attrs, len);
     policy = policy_to_string(p);
     return policy;
 }
-
-
-
-
 
 // int main()
 // {
@@ -1574,10 +1604,11 @@ void keygen()
     attrs = get_user_attrs(&n);
     int i;
     printf("user(%d) : [", n);
-    for(i=0; i<n; i++){
-        if(i!=0)printf("   ");
+    for (i = 0; i < n; i++)
+    {
+        if (i != 0)
+            printf("   ");
         printf("%s", attrs[i]);
-        
     }
     printf("]\n");
     pub = bswabe_pub_unserialize(suck_file(pub_file), 1);
@@ -1600,19 +1631,15 @@ void enc(const char *in_file, const char *out_file)
     // strcat(out_file, filename);
     // strcat(out_file, (char *)".cpabe");
     pub = bswabe_pub_unserialize(suck_file(pub_file), 1);
-    char *policy ;//= (char *)malloc(sizeof(char) * 100);
+    char *policy; //= (char *)malloc(sizeof(char) * 100);
     // policy = (char *)"name:kamal age:20 2of2";
     policy = get_encryption_rule();
     printf("Policy : [%s]\n", policy);
 
-
     int obj_attrs_len;
-    char ** obj_attrs = get_object_attrs(&obj_attrs_len, in_file);
+    char **obj_attrs = get_object_attrs(&obj_attrs_len, in_file);
     policy = simplify_policy(policy, obj_attrs, obj_attrs_len);
     printf("Updated policy : [%s]\n", policy);
-
-
-
 
     printf("In-file : [%s]\n", in_file);
     printf("Cpabe-file : [%s]\n", out_file);
