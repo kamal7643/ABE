@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
+#include <string.h>
 #include <pbc/pbc.h>
 #include <glib.h>
 #include <assert.h>
@@ -11,6 +12,15 @@
 #include <sys/stat.h>
 #include <time.h>
 
+#define MAX_LINE_LENGTH 1000
+#define KNRM  "\x1B[0m"
+#define KRED  "\x1B[31m"
+#define KGRN  "\x1B[32m"
+#define KYEL  "\x1B[33m"
+#define KBLU  "\x1B[34m"
+#define KMAG  "\x1B[35m"
+#define KCYN  "\x1B[36m"
+#define KWHT  "\x1B[37m"
 #define TYPE_A_PARAMS                                          \
     "type a\n"                                                 \
     "q 87807107996633125224377819847540498158068831994142082"  \
@@ -143,7 +153,7 @@ void bswabe_setup(bswabe_pub_t **pub, bswabe_msk_t **msk)
     element_pow_zn((*pub)->h, (*pub)->g, (*msk)->beta);
     pairing_apply((*pub)->g_hat_alpha, (*pub)->g, (*msk)->g_alpha, (*pub)->p);
 
-    printf("setup done\n");
+    // printf("setup done\n");
 }
 
 void element_from_string(element_t *h, char *s)
@@ -843,7 +853,8 @@ int bswabe_dec(bswabe_pub_t *pub, bswabe_prv_t *prv, bswabe_cph_t *cph, element_
     check_sat(cph->p, prv);
     if (!cph->p->satisfiable)
     {
-        printf("cannot decrypt, attributes in key do not satisfy policy\n");
+        // printf("")
+        printf("%scannot decrypt, attributes in key do not satisfy policy\n%s", KRED, KNRM);
         return 0;
     }
 
@@ -1233,36 +1244,35 @@ void bswabe_cph_free(bswabe_cph_t *cph)
 
 char **get_user_attrs(int *len)
 {
-    GByteArray *b = suck_file((char *)"../.ABE_DIR/attribute.txt");
-    int n;
-    char *attrs = unserialize_string(b, &n);
-
-    char **a = (char **)malloc(sizeof(char *) * n);
-
-    int i;
-    int j = 0;
-    int k = 0;
-    for (i = 0; i < n; i++)
-    {
-
-        if (i == 0)
-        {
-            a[0] = (char *)malloc(sizeof(char) * n);
-        }
-        if (attrs[i] == '\n')
-        {
-            k++;
-            a[k] = (char *)malloc(sizeof(char) * n);
-            j = 0;
-        }
-        else
-        {
-            a[k][j++] = attrs[i];
-        }
+    FILE    *textfile;
+    char    line[MAX_LINE_LENGTH];
+    char ** attrs = (char ** )malloc(sizeof(char *)*20);
+    textfile = fopen("/Users/kamalswami/Documents/ABE/.ABE_DIR/attribute.txt", "r");
+    if(textfile == NULL){
+        printf("cannot read attributes |||");
+        exit(1);
     }
-    k++;
-    *len = k;
-    return a;
+    int k=0;
+    while(fgets(line, MAX_LINE_LENGTH, textfile)){
+        attrs[k]=(char *)malloc(sizeof(char)*(strlen(line)));
+        // strcat(attrs[k], line);
+        int i, l= strlen(line);
+        int j=0;
+        
+        for(i=0; i<l; i++){
+            if(line[i]==10 || line[i]==13){
+
+            }else{
+                attrs[k][j]=line[i];
+                j++;
+            }
+        }
+        // printf("%s\n", line);
+        k++;
+    }
+    fclose(textfile);
+    *len =k;
+    return attrs;
 }
 
 char *itoa(int num, char *buffer, int base)
@@ -1303,37 +1313,177 @@ char *itoa(int num, char *buffer, int base)
 
 char *get_encryption_rule()
 {
-    char *policy;
-    int n;
-    GByteArray *b = suck_file((char *)"../.ABE_DIR/rules.txt");
-    policy = unserialize_string(b, &n);
-    int i;
-    int j=0;
+    FILE    *textfile;
+    char    line[MAX_LINE_LENGTH];
+    char ** attrs = (char ** )malloc(sizeof(char *)*20);
+    textfile = fopen("/Users/kamalswami/Documents/ABE/.ABE_DIR/rules.txt", "r");
+    if(textfile == NULL){
+        printf("cannot read rules |||");
+        exit(1);
+    }
+    char * rule = (char *)malloc(sizeof(char)*MAX_LINE_LENGTH);
     int k=0;
-    for(i=0; i<n; i++){
-        // printf("%d\t%c\n", policy[i], policy[i]);
-        if(policy[i]==13){
-            policy[j]=' ';
-            j++;
+    while(fgets(line, MAX_LINE_LENGTH, textfile)){
+        char * imp = (char *)malloc(sizeof(char)*strlen(line));
+        int j=0;
+        int l = strlen(line);
+        int i;
+        for(i=0; i<l; i++){
+            if(line[i]==10 || line[i]==13){
+
+            }else{
+                imp[j]=line[i];
+                j++;
             }
-        else if(policy[i]==10 || policy[i]==0){
-            // printf("here");
-            // printf("%d\t%c\n", policy[i], policy[i]);
-            // j--;
-            k++;
+        }
+        if(k==0){
+            strcat(rule, imp);
         }else{
-            policy[j]=policy[i];
-            j++;
+            strcat(rule, " ");
+            strcat(rule, imp);
+        }
+
+        k++;
+    }
+    strcat(rule, " 1of");
+    rule[strlen(rule)]='0'+k;
+    // printf("new : %s\n",rule);
+    fclose(textfile);
+    return rule;
+
+
+    // char *policy;
+    // int n;
+    // GByteArray *b = suck_file((char *)"/Users/kamalswami/Documents/ABE/.ABE_DIR/rules.txt");
+    // policy = unserialize_string(b, &n);
+    // int i;
+    // int j=0;
+    // int k=0;
+    // for(i=0; i<n; i++){
+    //     // printf("%d\t%c\n", policy[i], policy[i]);
+    //     if(policy[i]==13){
+    //         policy[j]=' ';
+    //         j++;
+    //         }
+    //     else if(policy[i]==10){
+    //         // printf("here");
+    //         // printf("%d\t%c\n", policy[i], policy[i]);
+    //         // j--;
+    //         k++;
+    //     }
+    //     else if(policy[i]==0){
+    //         // k++;
+    //     }
+    //     else{
+    //         policy[j]=policy[i];
+    //         j++;
+    //     }
+    // }
+    // policy[j]=' ';
+    // policy[++j]='1';
+    // policy[++j]='o';
+    // policy[++j]='f';
+    // policy[++j]='0'+k+1;
+    // // printf("%s", policy);
+    // return policy;
+}
+
+
+char ** get_object_attrs(int *len, char *file){
+    char ** attrs=(char **)malloc(sizeof(char *)*2);
+    char *ext = strrchr(file, '.');
+    if (ext == NULL) {
+        printf("File has no extension\n");
+    } else {
+        // printf("File extension: %s\n", ext+1);
+    }
+    attrs[0]=(char *)malloc(sizeof(char)*20);
+    strcat(attrs[0], "obj-type:");
+    strcat(attrs[0], ext+1);
+
+    struct stat sb;
+    if (stat(file, &sb) == -1) {
+        printf("error stat");
+        return attrs;
+    }
+    // printf("File size: %lld bytes\n", sb.st_size);
+    attrs[1]=(char *)malloc(sizeof(char)*20);
+    strcat(attrs[1], "obj-size:");
+    char str[100];
+    strcat(attrs[1], itoa(sb.st_size, str, 10));
+    strcat(attrs[1], "b");
+    *len =2;
+    return attrs;
+}
+
+int sim_bswabe_policy(bswabe_policy_t * p, char **obj_attrs, int len){
+    int rem =0;
+    int i;
+    int count = p->children->len;
+    // printf("%s%s%s", KGRN, p->attr, KNRM);
+    if(count==0){
+        
+        for(i=0; i<len; i++){
+            if(strcmp(p->attr, obj_attrs[i])==0){
+                p->k--;
+                rem++;
+            }
+        }
+    }else{
+        for(i=0; i<count; i++){
+            rem = sim_bswabe_policy(g_ptr_array_index(p->children, i), obj_attrs, len);
+            p->k-=rem;
+            rem=0;
         }
     }
-    policy[j]=' ';
-    policy[++j]='1';
-    policy[++j]='o';
-    policy[++j]='f';
-    policy[++j]='0'+k;
-    // printf("%s", policy);
+
+    return rem;
+}
+
+char * policy_to_string(bswabe_policy_t* p){
+    char * st = (char *)malloc(sizeof(char)*MAX_LINE_LENGTH);
+    int count = p->children->len;
+    if(count==0){
+        strcat(st, p->attr);
+    }else{
+        int i;
+        for(i=0; i<count; i++){
+            if(strlen(st)==0){
+                strcat(st, policy_to_string(g_ptr_array_index(p->children, i)));
+            }else{
+                strcat(st, " ");
+                strcat(st, policy_to_string(g_ptr_array_index(p->children, i)));
+            }
+        }
+        strcat(st, " ");
+        char str[100];
+        strcat(st, itoa(p->k, str, 10));
+        strcat(st, "of");
+        strcat(st, itoa(count, str, 10));
+    }
+
+    return st;
+}
+
+char * simplify_policy(char *policy, char ** obj_attrs, int len){
+
+    int i;
+    printf("File : [");
+    for(i=0; i<len; i++){
+        if(i!=0)printf("   ");
+        printf("%s", obj_attrs[i]);
+    }
+    printf("]\n");
+
+    bswabe_policy_t *p = parse_policy_postfix(policy);
+    int x =sim_bswabe_policy(p,  obj_attrs, len);
+    policy = policy_to_string(p);
     return policy;
 }
+
+
+
+
 
 // int main()
 // {
@@ -1400,36 +1550,47 @@ element_t m1;
 
 void setup()
 {
+    printf("\n\n++++++++++++++++++++ setup start ++++++++++++++++++++\n");
     bswabe_setup(&pub, &msk);
     // time_t t;
     // time(&t);
     // printf("\nSetup completed at : %s", ctime(&t));
     spit_file(pub_file, bswabe_pub_serialize(pub), 1);
     spit_file(msk_file, bswabe_msk_serialize(msk), 1);
-    printf("Public key is in : %s\n", pub_file);
-    printf("Master key is in : %s\n", msk_file);
-    printf("Setup done ...\n");
+    printf("Public key is in : [%s]\n", pub_file);
+    printf("Master key is in : [%s]\n", msk_file);
+    printf("++++++++++++++++++++ setup done ++++++++++++++++++++\n\n");
 }
 
 void keygen()
 {
+    printf("\n\n++++++++++++++++++++ keygen start ++++++++++++++++++++\n");
     char **attrs = (char **)malloc(sizeof(char *) * 2);
     attrs[0] = (char *)malloc(sizeof(char) * 50);
     attrs[1] = (char *)malloc(sizeof(char) * 50);
     attrs[0] = (char *)"name:kamal";
     attrs[1] = (char *)"age:20";
     int n;
-    attrs = get_user_attrs(&n;);
+    attrs = get_user_attrs(&n);
+    int i;
+    printf("user(%d) : [", n);
+    for(i=0; i<n; i++){
+        if(i!=0)printf("   ");
+        printf("%s", attrs[i]);
+        
+    }
+    printf("]\n");
     pub = bswabe_pub_unserialize(suck_file(pub_file), 1);
     msk = bswabe_msk_unserialize(pub, suck_file(msk_file), 1);
     prv = bswabe_keygen(pub, msk, attrs, n);
     spit_file(prv_file, bswabe_prv_serialize(prv), 1);
-    printf("Private key is in : %s\n", prv_file);
-    printf("Keygen done ...\n");
+    printf("Private key is in : [%s]\n", prv_file);
+    printf("++++++++++++++++++++ keygen done ++++++++++++++++++++\n\n");
 }
 
 void enc(const char *in_file, const char *out_file)
 {
+    printf("\n\n++++++++++++++++++++ encryption start ++++++++++++++++++++\n");
     // in_file = (char *)malloc(sizeof(char)*100);
     // out_file = (char *)malloc(sizeof(char)*100);
     // in_file = (char *)".ABE_DIR/files/";
@@ -1439,21 +1600,36 @@ void enc(const char *in_file, const char *out_file)
     // strcat(out_file, filename);
     // strcat(out_file, (char *)".cpabe");
     pub = bswabe_pub_unserialize(suck_file(pub_file), 1);
-    char *policy = (char *)malloc(sizeof(char) * 100);
-    policy = (char *)"name:kamal age:20 2of2";
+    char *policy ;//= (char *)malloc(sizeof(char) * 100);
+    // policy = (char *)"name:kamal age:20 2of2";
     policy = get_encryption_rule();
     printf("Policy : [%s]\n", policy);
+
+
+    int obj_attrs_len;
+    char ** obj_attrs = get_object_attrs(&obj_attrs_len, in_file);
+    policy = simplify_policy(policy, obj_attrs, obj_attrs_len);
+    printf("Updated policy : [%s]\n", policy);
+
+
+
+
+    printf("In-file : [%s]\n", in_file);
+    printf("Cpabe-file : [%s]\n", out_file);
     cph = bswabe_enc(pub, &m, policy);
     cph_buf = bswabe_cph_serialize(cph);
     plt = suck_file(in_file);
     file_len = plt->len;
     aes_buf = aes_128_cbc_encrypt(plt, m);
     write_cpabe_file(out_file, cph_buf, file_len, aes_buf);
-    printf("Encryption done ...\n");
+    printf("++++++++++++++++++++ encryption done ++++++++++++++++++++\n\n");
 }
 
 void dec(const char *out_file, const char *dec_file)
 {
+    printf("\n\n++++++++++++++++++++ decryption start ++++++++++++++++++++\n");
+    printf("Capbe file : [%s]\n", out_file);
+    printf("Out-file : [%s]\n", dec_file);
     // out_file = (char *)".ABE_DIR/encryption/";
     // strcat(out_file, (char *)filename);
     // strcat(out_file, (char *)".cpabe");
@@ -1465,12 +1641,12 @@ void dec(const char *out_file, const char *dec_file)
     cph = bswabe_cph_unserialize(pub, cph_buf, 1);
     if (!bswabe_dec(pub, prv, cph, &m1))
     {
-        printf("error");
+        printf("++++++++++++++++++++ decryption done ++++++++++++++++++++\n\n");
         return;
     }
     GByteArray *plt1 = aes_128_cbc_decrypt(aes_buf, m1);
     spit_file(dec_file, plt1, 1);
-    printf("Dncryption done ...\n");
+    printf("++++++++++++++++++++ decryption done ++++++++++++++++++++\n\n");
 }
 
 void reciver(const char *str)
