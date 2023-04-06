@@ -1,0 +1,244 @@
+ * Serving Flask app 'app2'
+ * Debug mode: on
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.145.102.96:5000
+Press CTRL+C to quit
+ * Restarting with stat
+
+
+++++++++++++++++++++ setup start ++++++++++++++++++++
+Public key is in : [.ABE_DIR/pub_key]
+Master key is in : [.ABE_DIR/master_key]
+++++++++++++++++++++ setup done ++++++++++++++++++++
+
+ * Debugger is active!
+ * Debugger PIN: 727-302-826
+127.0.0.1 - - [06/Apr/2023 13:17:24] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [06/Apr/2023 13:17:24] "GET /images/favicon.ico HTTP/1.1" 404 -
+127.0.0.1 - - [06/Apr/2023 13:17:26] "GET /encrypt HTTP/1.1" 200 -
+
+
+++++++++++++++++++++ encryption start ++++++++++++++++++++
+Policy : [department:cs designation:student 2of2 department:ee description:faculty obj-type:rar 3of3 1of2]
+File : [obj-type:bin   obj-size:0b]
+Updated policy : [department:cs designation:student 2of2 department:ee description:faculty obj-type:rar 3of3 1of2]
+In-file : [.ABE_DIR/files/file1.bin]
+Cpabe-file : [.ABE_DIR/encryption/file1.bin.cpabe]
+++++++++++++++++++++ encryption done ++++++++++++++++++++
+
+
+
+++++++++++++++++++++ encryption start ++++++++++++++++++++
+Policy : [department:cs designation:student 2of2 department:ee description:faculty obj-type:rar 3of3 1of2]
+File : [obj-type:pdf   obj-size:0b]
+Updated policy : [department:cs designation:student 2of2 department:ee description:faculty obj-type:rar 3of3 1of2]
+In-file : [.ABE_DIR/files/file1.pdf]
+Cpabe-file : [.ABE_DIR/encryption/file1.pdf.cpabe]
+++++++++++++++++++++ encryption done ++++++++++++++++++++
+
+
+
+++++++++++++++++++++ encryption start ++++++++++++++++++++
+Policy : [department:cs designation:student 2of2 department:ee description:faculty obj-type:rar 3of3 1of2]
+File : [obj-type:png   obj-size:0b]
+Updated policy : [department:cs designation:student 2of2 department:ee description:faculty obj-type:rar 3of3 1of2]
+In-file : [.ABE_DIR/files/file1.png]
+Cpabe-file : [.ABE_DIR/encryption/file1.png.cpabe]
+++++++++++++++++++++ encryption done ++++++++++++++++++++
+
+
+
+++++++++++++++++++++ encryption start ++++++++++++++++++++
+Policy : [department:cs designation:student 2of2 department:ee description:faculty obj-type:rar 3of3 1of2]
+File : [obj-type:txt   obj-size:0b]
+Updated policy : [department:cs designation:student 2of2 department:ee description:faculty obj-type:rar 3of3 1of2]
+In-file : [.ABE_DIR/files/file1.txt]
+Cpabe-file : [.ABE_DIR/encryption/file1.txt.cpabe]
+++++++++++++++++++++ encryption done ++++++++++++++++++++
+
+
+
+++++++++++++++++++++ encryption start ++++++++++++++++++++
+Policy : [department:cs designation:student 2of2 department:ee description:faculty obj-type:rar 3of3 1of2]
+File : [obj-type:zip   obj-size:0b]
+Updated policy : [department:cs designation:student 2of2 department:ee description:faculty obj-type:rar 3of3 1of2]
+In-file : [.ABE_DIR/files/file1.zip]
+Cpabe-file : [.ABE_DIR/encryption/file1.zip.cpabe]
+++++++++++++++++++++ encryption done ++++++++++++++++++++
+
+127.0.0.1 - - [06/Apr/2023 13:17:49] "POST /encrypt HTTP/1.1" 302 -
+127.0.0.1 - - [06/Apr/2023 13:17:49] "GET /encryption/download HTTP/1.1" 200 -
+127.0.0.1 - - [06/Apr/2023 13:18:24] "POST /encryption/download HTTP/1.1" 200 -
+127.0.0.1 - - [06/Apr/2023 13:19:00] "GET /decrypt HTTP/1.1" 200 -
+
+
+++++++++++++++++++++ keygen start ++++++++++++++++++++
+user(5) : [department:cs   age:20   designation:student   env-day:Tuesday   env-device:macOS]
+Private key is in : [.ABE_DIR/prv_key]
+++++++++++++++++++++ keygen done ++++++++++++++++++++
+
+
+
+++++++++++++++++++++ decryption start ++++++++++++++++++++
+Capbe file : [.ABE_DIR/encryption/file1.bin.cpabe]
+Out-file : [.ABE_DIR/decryption/file1.bin]
+++++++++++++++++++++ decryption done ++++++++++++++++++++
+
+
+
+++++++++++++++++++++ decryption start ++++++++++++++++++++
+Capbe file : [.ABE_DIR/encryption/file1.pdf.cpabe]
+Out-file : [.ABE_DIR/decryption/file1.pdf]
+++++++++++++++++++++ decryption done ++++++++++++++++++++
+
+
+
+++++++++++++++++++++ decryption start ++++++++++++++++++++
+Capbe file : [.ABE_DIR/encryption/file1.png.cpabe]
+Out-file : [.ABE_DIR/decryption/file1.png]
+++++++++++++++++++++ decryption done ++++++++++++++++++++
+
+
+
+++++++++++++++++++++ decryption start ++++++++++++++++++++
+Capbe file : [.ABE_DIR/encryption/file1.txt.cpabe]
+Out-file : [.ABE_DIR/decryption/file1.txt]
+++++++++++++++++++++ decryption done ++++++++++++++++++++
+
+
+
+++++++++++++++++++++ decryption start ++++++++++++++++++++
+Capbe file : [.ABE_DIR/encryption/file1.zip.cpabe]
+Out-file : [.ABE_DIR/decryption/file1.zip]
+++++++++++++++++++++ decryption done ++++++++++++++++++++
+
+
+
+
+
+
+TEST CASE 2 WHERE only txt files will be allowed to access
+
+
+* Serving Flask app 'app2'
+ * Debug mode: on
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.145.102.96:5000
+Press CTRL+C to quit
+ * Restarting with stat
+
+
+++++++++++++++++++++ setup start ++++++++++++++++++++
+Public key is in : [.ABE_DIR/pub_key]
+Master key is in : [.ABE_DIR/master_key]
+++++++++++++++++++++ setup done ++++++++++++++++++++
+
+ * Debugger is active!
+ * Debugger PIN: 727-302-826
+
+
+++++++++++++++++++++ encryption start ++++++++++++++++++++
+Policy : [department:cs designation:student obj-type:txt 3of3 department:ee description:faculty obj-type:rar 3of3 1of2]
+File : [obj-type:bin   obj-size:0b]
+Updated policy : [department:cs designation:student obj-type:txt 3of3 department:ee description:faculty obj-type:rar 3of3 1of2]
+In-file : [.ABE_DIR/files/file1.bin]
+Cpabe-file : [.ABE_DIR/encryption/file1.bin.cpabe]
+++++++++++++++++++++ encryption done ++++++++++++++++++++
+
+
+
+++++++++++++++++++++ encryption start ++++++++++++++++++++
+Policy : [department:cs designation:student obj-type:txt 3of3 department:ee description:faculty obj-type:rar 3of3 1of2]
+File : [obj-type:pdf   obj-size:0b]
+Updated policy : [department:cs designation:student obj-type:txt 3of3 department:ee description:faculty obj-type:rar 3of3 1of2]
+In-file : [.ABE_DIR/files/file1.pdf]
+Cpabe-file : [.ABE_DIR/encryption/file1.pdf.cpabe]
+++++++++++++++++++++ encryption done ++++++++++++++++++++
+
+
+
+++++++++++++++++++++ encryption start ++++++++++++++++++++
+Policy : [department:cs designation:student obj-type:txt 3of3 department:ee description:faculty obj-type:rar 3of3 1of2]
+File : [obj-type:png   obj-size:0b]
+Updated policy : [department:cs designation:student obj-type:txt 3of3 department:ee description:faculty obj-type:rar 3of3 1of2]
+In-file : [.ABE_DIR/files/file1.png]
+Cpabe-file : [.ABE_DIR/encryption/file1.png.cpabe]
+++++++++++++++++++++ encryption done ++++++++++++++++++++
+
+
+
+++++++++++++++++++++ encryption start ++++++++++++++++++++
+Policy : [department:cs designation:student obj-type:txt 3of3 department:ee description:faculty obj-type:rar 3of3 1of2]
+File : [obj-type:txt   obj-size:0b]
+Updated policy : [department:cs designation:student obj-type:txt 2of3 department:ee description:faculty obj-type:rar 3of3 1of2]
+In-file : [.ABE_DIR/files/file1.txt]
+Cpabe-file : [.ABE_DIR/encryption/file1.txt.cpabe]
+++++++++++++++++++++ encryption done ++++++++++++++++++++
+
+
+
+++++++++++++++++++++ encryption start ++++++++++++++++++++
+Policy : [department:cs designation:student obj-type:txt 3of3 department:ee description:faculty obj-type:rar 3of3 1of2]
+File : [obj-type:zip   obj-size:0b]
+Updated policy : [department:cs designation:student obj-type:txt 3of3 department:ee description:faculty obj-type:rar 3of3 1of2]
+In-file : [.ABE_DIR/files/file1.zip]
+Cpabe-file : [.ABE_DIR/encryption/file1.zip.cpabe]
+++++++++++++++++++++ encryption done ++++++++++++++++++++
+
+127.0.0.1 - - [06/Apr/2023 13:23:33] "POST /encrypt HTTP/1.1" 302 -
+127.0.0.1 - - [06/Apr/2023 13:23:33] "GET /encryption/download HTTP/1.1" 200 -
+127.0.0.1 - - [06/Apr/2023 13:23:34] "POST /encryption/download HTTP/1.1" 200 -
+127.0.0.1 - - [06/Apr/2023 13:23:38] "GET /decrypt HTTP/1.1" 200 -
+
+
+++++++++++++++++++++ keygen start ++++++++++++++++++++
+user(5) : [department:cs   age:20   designation:student   env-day:Tuesday   env-device:macOS]
+Private key is in : [.ABE_DIR/prv_key]
+++++++++++++++++++++ keygen done ++++++++++++++++++++
+
+
+
+++++++++++++++++++++ decryption start ++++++++++++++++++++
+Capbe file : [.ABE_DIR/encryption/file1.bin.cpabe]
+Out-file : [.ABE_DIR/decryption/file1.bin]
+cannot decrypt, attributes in key do not satisfy policy
+++++++++++++++++++++ decryption done ++++++++++++++++++++
+
+
+
+++++++++++++++++++++ decryption start ++++++++++++++++++++
+Capbe file : [.ABE_DIR/encryption/file1.pdf.cpabe]
+Out-file : [.ABE_DIR/decryption/file1.pdf]
+cannot decrypt, attributes in key do not satisfy policy
+++++++++++++++++++++ decryption done ++++++++++++++++++++
+
+
+
+++++++++++++++++++++ decryption start ++++++++++++++++++++
+Capbe file : [.ABE_DIR/encryption/file1.png.cpabe]
+Out-file : [.ABE_DIR/decryption/file1.png]
+cannot decrypt, attributes in key do not satisfy policy
+++++++++++++++++++++ decryption done ++++++++++++++++++++
+
+
+
+++++++++++++++++++++ decryption start ++++++++++++++++++++
+Capbe file : [.ABE_DIR/encryption/file1.txt.cpabe]
+Out-file : [.ABE_DIR/decryption/file1.txt]
+++++++++++++++++++++ decryption done ++++++++++++++++++++
+
+
+
+++++++++++++++++++++ decryption start ++++++++++++++++++++
+Capbe file : [.ABE_DIR/encryption/file1.zip.cpabe]
+Out-file : [.ABE_DIR/decryption/file1.zip]
+cannot decrypt, attributes in key do not satisfy policy
+++++++++++++++++++++ decryption done ++++++++++++++++++++
+
+127.0.0.1 - - [06/Apr/2023 13:24:04] "POST /decrypt HTTP/1.1" 302 -
+127.0.0.1 - - [06/Apr/2023 13:24:04] "GET /decryption/download HTTP/1.1" 200 -
+127.0.0.1 - - [06/Apr/2023 13:24:05] "POST /decryption/download HTTP/1.1" 200 -
