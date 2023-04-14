@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
-    <title>Document</title>
+    <title>Download the Encrypted files</title>
     <style>
         .header {
             overflow: hidden;
@@ -49,7 +49,7 @@
         }
 
         .center{
-            border: 1px solid gray;
+            /* border: 1px solid gray; */
             padding:10px;
             margin: 0;
             position: absolute;
@@ -70,11 +70,22 @@
                 float: none;
             }
         }
+        .btn {
+            margin-top:10px;
+            border: 2px solid gray;
+            color: gray;
+            background-color: white;
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-size: 20px;
+            font-weight: bold;
+            box-shadow: 5px 10px #888888;
+        }
     </style>
 </head>
 <body>
     <div class="header">
-        <a href="#default" class="logo">ABE</a>
+        <a href="/#default" class="logo">ABE</a>
         <div class="header-right">
             <a href="/">Home</a>
             <a href="/encrypt">Encrypt</a>
@@ -83,7 +94,7 @@
     </div>
     <div class="center">
         <form action = "/encryption/download" method = "post" enctype="multipart/form-data">  
-            <input type = "submit" value="download">  
+            <input class="btn" type = "submit" value="download">  
         </form> 
     </div>
     

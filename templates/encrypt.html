@@ -7,6 +7,17 @@
     <title>Encryption using ABE</title>
     <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
     <style>
+        .btn {
+            margin-top:10px;
+            border: 2px solid gray;
+            color: gray;
+            background-color: white;
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-size: 20px;
+            font-weight: bold;
+            box-shadow: 5px 10px #888888;
+        }
         .header {
             overflow: hidden;
             background-color: #423fee;
@@ -56,6 +67,8 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
+            border-radius: 10px;
+            
         }
 
         /* Add media queries for responsiveness - when the screen is 500px wide or less, stack the links on top of each other */
@@ -69,13 +82,19 @@
             .header-right {
                 float: none;
             }
+            
+        }
+        table{
+            width: 500px;
+            height: 300px;
+            text-align: center;
         }
     </style>
 </head>
 <body>
     <div>
         <div class="header">
-            <a href="#default" class="logo">ABE</a>
+            <a href="/#default" class="logo">ABE</a>
             <div class="header-right">
                 <a href="/">Home</a>
                 <a class="active" href="/encrypt">Encrypt</a>
@@ -96,7 +115,7 @@
                 </tr>
                 <tr>
                     <td></td>
-                    <td><input type = "submit" value="Upload"> </td>
+                    <td><input class="btn" type = "submit" value="Upload"> </td>
                 </tr>
             </table>
             <br/>
